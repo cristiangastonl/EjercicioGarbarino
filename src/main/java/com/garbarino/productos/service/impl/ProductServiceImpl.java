@@ -7,13 +7,13 @@ import javax.validation.ValidationException;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import com.garbarino.productos.Response.GenericResponse;
 import com.garbarino.productos.entity.Brand;
 import com.garbarino.productos.entity.Product;
 import com.garbarino.productos.jpa.ProductRepository;
 import com.garbarino.productos.service.GenericService;
+import com.garbarino.productos.validator.Validator;
 
 
 /**
@@ -22,12 +22,9 @@ import com.garbarino.productos.service.GenericService;
  */
 @Service
 public class ProductServiceImpl implements GenericService<Product, Integer> {
-	
-	private final static String VALIDACION_NOMBRE_NULL_VACIO = "Se debe ingresar un nombre";
-	private final static String VALIDACION_DESCRIPCION_NULL_VACIO = "Se debe ingresar una descripcion no vacia";
-	private final static String VALIDACION_PRECIO_POSITIVO = "Se debe ingresar un price positivo";
-	private final static String VALIDACION_BRAND_VALIDO = "Se debe ingresar un brand válido. e.g: GARBARINO, COMPUMUNDO";
-	
+		
+	public static final String STOCK_MODIFICADO_CORRECTAMENTE = "Stock modificado correctamente!";
+	public static final String ERROR_AL_MODIFICAR_EL_STOCK = "Error al modificar el Stock!";
 	private final ProductRepository productRepository;
 	
 	public ProductServiceImpl(final ProductRepository productRepository) {
@@ -96,19 +93,20 @@ public class ProductServiceImpl implements GenericService<Product, Integer> {
 	 * @param result
 	 * @return
 	 */
-	public ResponseEntity<StringBuilder> updateStock(Integer id, Integer stock, StringBuilder result) {
+	public ResponseEntity<StringBuilder> updateStock(Integer id, Integer stock) {
 		ResponseEntity<StringBuilder> response;
+		StringBuilder result = new StringBuilder();
+		
 		Product productoAActualizar = this.get(id);		
 		Integer stockActual = productoAActualizar.getStock();
-		Integer stockResultante = stockActual + stock;
-		
+		Integer stockResultante = stockActual + stock;				
 		if (productoAActualizar == null || stockResultante < 0) {
-			result.append("Error al modificar el Stock!");
+			result.append(ERROR_AL_MODIFICAR_EL_STOCK);
 			response = ResponseEntity.badRequest().body(result);
 		} else {
-			productoAActualizar.setStock(stock);
+			productoAActualizar.setStock(stockResultante);
 			this.update(productoAActualizar);
-			result.append("Stock modificado correctamente!");
+			result.append(STOCK_MODIFICADO_CORRECTAMENTE);
 			response = ResponseEntity.ok(result);
 		}
 		return response;
@@ -124,68 +122,10 @@ public class ProductServiceImpl implements GenericService<Product, Integer> {
 	 */
 	public ResponseEntity<GenericResponse<Product>> addNewProduct(Product product) throws ValidationException{
 		
-		this.validateInputsProduct(product);
+		Validator.validateInputsProduct(product);
 		Product savedProduct = this.save(product);
 		ResponseEntity<GenericResponse<Product>> response = ResponseEntity.created(URI.create("/" + product.getId())).body(new GenericResponse<>(savedProduct));
 		return response;
-	}
-
-	/**
-	 * 	Metodo que se encarga de validar los inputs de un producto.
-	 * 
-	 * @param product
-	 */
-	private void validateInputsProduct(Product product) throws ValidationException{
-		boolean valido = true;
-		String msg = "validaciones";
-		if (!StringUtils.hasText(product.getName())){
-			// valida que no sea null el nombre y que tenga al menos un caracter que no sea un espacio.
-			valido = false;
-			msg = String.format("%s, %s", msg, VALIDACION_NOMBRE_NULL_VACIO);					
-		}
-		if (!StringUtils.hasText(product.getDescription())) {
-			// valida que no sea null la descripcion y que tenga al menos un caracter que no sea un espacio.
-			valido = false;
-			msg = String.format("%s, %s", msg, VALIDACION_DESCRIPCION_NULL_VACIO);	
-		}
-		if (product.getPrice() == null || product.getPrice() < 0 ) {
-			// valida que el precio no sea nulo y que sea mayor a 0.
-			valido = false;
-			msg = String.format("%s, %s", msg, VALIDACION_PRECIO_POSITIVO);
-		}
-		if(product.getStock() == null || product.getStock() < 0) {
-			// valida que el stock sea un numero positivo y que no sea null.
-			valido = false;
-			msg = String.format("%s, %s", msg, VALIDACION_PRECIO_POSITIVO);
-		}
-		if(product.getBrand() == null || !esUnBrandValido(product.getBrand())) {
-			// valida que el brand sea uno valido y distinto de null.
-			valido = false;
-			msg = String.format("%s, %s", msg, VALIDACION_BRAND_VALIDO);
-		}
-		
-		if (!valido) {
-			throw new ValidationException(msg);
-		}
-		
-	}
-
-	/**
-	 * 	Itera entre todos los posibles Brands y decide si el brand pasado por parametro es valido.
-	 * 
-	 * @param brand
-	 * @return
-	 */
-	private boolean esUnBrandValido(Brand brand) {
-		Boolean exist = false;
-		for (Brand nombre : Brand.values()) {
-			if (exist = nombre.toString().equals(brand.toString())) {
-				// Encontre uno, entonces es un brand valido.
-				break;
-			}
-		}
-		
-		return exist;
 	}
 
 }

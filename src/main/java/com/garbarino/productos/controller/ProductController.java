@@ -39,7 +39,6 @@ public class ProductController {
 		return response;
 	}
 
-
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<GenericResponse<Product>> create(@RequestBody Product product) throws ValidationException{	
 		ResponseEntity<GenericResponse<Product>> response;
@@ -53,8 +52,7 @@ public class ProductController {
 
 	@PutMapping(value = "/{id}/stock")
 	public ResponseEntity<?> update(@PathVariable("id") Integer id, @RequestParam(value="q") Integer stock ) {
-		StringBuilder result = new StringBuilder();	
-		ResponseEntity<StringBuilder> response = productServiceImpl.updateStock(id, stock, result); 		
+		ResponseEntity<StringBuilder> response = productServiceImpl.updateStock(id, stock); 		
 		return response;
 	}
 

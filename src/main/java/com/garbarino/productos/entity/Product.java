@@ -137,8 +137,8 @@ public class Product {
 	@Override
 	public String toString() {
 		return String.format(
-				"Product [getId()=%s, getName()=%s, getBrand()=%s, getPrice()=%s, getDescription()=%s, getStock()=%s]",
-				getId(), getName(), getBrand(), getPrice(), getDescription(), getStock());
+				"{\"id\":%s,\"name\":\"%s\",\"description\":\"%s\",\"price\":%s,\"stock\":%s,\"brand\":\"%S\"}",
+				getId(), getName(), getDescription(), getPrice(), getStock(), getBrand() );
 	}
 
 }
