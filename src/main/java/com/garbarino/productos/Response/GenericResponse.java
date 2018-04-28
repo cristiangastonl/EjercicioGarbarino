@@ -1,4 +1,4 @@
-package com.garbarino.productos.vo;
+package com.garbarino.productos.Response;
 
 
 /**

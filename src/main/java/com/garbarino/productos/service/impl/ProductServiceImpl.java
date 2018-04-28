@@ -9,11 +9,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import com.garbarino.productos.Response.GenericResponse;
 import com.garbarino.productos.entity.Brand;
 import com.garbarino.productos.entity.Product;
 import com.garbarino.productos.jpa.ProductRepository;
 import com.garbarino.productos.service.GenericService;
-import com.garbarino.productos.vo.GenericResponse;
 
 
 /**
@@ -23,9 +23,9 @@ import com.garbarino.productos.vo.GenericResponse;
 @Service
 public class ProductServiceImpl implements GenericService<Product, Integer> {
 	
-	private final static String VALIDACION_NOMBRE_NULL_VACIO = "Se debe ingresas un nombre";
+	private final static String VALIDACION_NOMBRE_NULL_VACIO = "Se debe ingresar un nombre";
 	private final static String VALIDACION_DESCRIPCION_NULL_VACIO = "Se debe ingresar una descripcion no vacia";
-	private final static String VALIDACION_PRECIO_POSITIVO = "Se debe ingresar un price positivos";
+	private final static String VALIDACION_PRECIO_POSITIVO = "Se debe ingresar un price positivo";
 	private final static String VALIDACION_BRAND_VALIDO = "Se debe ingresar un brand válido. e.g: GARBARINO, COMPUMUNDO";
 	
 	private final ProductRepository productRepository;
